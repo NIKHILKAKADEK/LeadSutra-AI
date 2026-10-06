@@ -44,3 +44,15 @@ dist/
 Thumbs.db
 
 
+
+# Local databases
+*.sqlite
+*.sqlite3
+*.db
+
+# Runtime/local data
+data/
+
+# Logs
+*.log
+logs/
