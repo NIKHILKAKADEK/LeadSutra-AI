@@ -1,104 +1,100 @@
 # LeadSutra AI Backend
 
-Autonomous lead discovery, enrichment, qualification, scoring, voice calling, and email outreach backend engine.
-
----
+Autonomous backend engine for **lead discovery, enrichment, qualification, scoring, voice calling, and email outreach**.
 
 ## 🚀 Quick Start
 
-Run commands from the `backend` directory using the virtual environment:
+Run the following commands from the `backend` directory.
+
+**Start the server**
 
 ```powershell
 .\venv\Scripts\python.exe run.py
 ```
 
-The server listens locally on `http://127.0.0.1:8000`.
+**API server:** http://127.0.0.1:8000
 
-To install or refresh dependencies:
+**Install or refresh dependencies**
 
 ```powershell
 .\venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
----
-
-## 🛠 Project Dependencies
+## 🛠️ Technology Stack
 
 | Package | Version | Purpose |
-| --- | --- | --- |
-| `fastapi` | `0.142.2` | High-performance ASGI Web API Framework |
-| `uvicorn` | `0.54.0` | Production ASGI Server |
-| `pydantic` | `2.13.5` | Data Validation & Schema Definition |
-| `pydantic-settings` | `2.15.0` | Hierarchical Environment Settings Management |
-| `httpx` | `0.28.1` | Async HTTP Client with Redirect & Pinned Transport Protection |
-| `playwright` | `1.63.0` | Headless Browser Scraper for Google Maps & Dynamic Crawling |
-| `beautifulsoup4` | `4.15.0` | HTML Parsing for Lead Web Scraping & Enrichment |
-| `omnidimension` | `0.4.2` | Voice Calling Provider SDK |
-| `python-dotenv` | `1.2.4` | Environment Variable Loading from `.env` |
-| `requests` | `2.34.2` | HTTP Requests Library |
+|---|---|---|
+| `fastapi` | `0.142.2` | API framework |
+| `uvicorn` | `0.54.0` | ASGI server |
+| `pydantic` | `2.13.5` | Request validation and data schemas |
+| `pydantic-settings` | `2.15.0` | Environment-based configuration |
+| `httpx` | `0.28.1` | Asynchronous HTTP client |
+| `playwright` | `1.63.0` | Browser automation and dynamic scraping |
+| `beautifulsoup4` | `4.15.0` | HTML parsing and website enrichment |
+| `omnidimension` | `0.4.2` | Voice calling provider SDK |
+| `python-dotenv` | `1.2.4` | Environment variable loading |
+| `requests` | `2.34.2` | HTTP client library |
 
----
+## ⚙️ Environment Configuration
 
-## ⚙️ Environment Configuration (`.env`)
-
-Edit `backend/.env`. Key supported controls (see `.env.example` for details):
+Configure environment variables in `backend/.env`. Use `.env.example` as the reference for supported settings.
 
 | Setting | Default | Description |
-| --- | --- | --- |
-| `LEADSUTRA_ENABLE_GOOGLE_PLACES` | `true` | Enable Google Places API for lead discovery |
-| `LEADSUTRA_ENABLE_MAPS_BROWSER` | `true` | Enable Playwright Google Maps browser fallback scraper |
-| `LEADSUTRA_ENABLE_MAPS_BROWSER_FALLBACK` | `false` | Fall back to Maps browser on Places retryable errors |
-| `LEADSUTRA_MAPS_FALLBACK_ON_ZERO_RESULTS` | `false` | Fall back to Maps browser if Places returns zero leads |
-| `OUTBOUND_CALLS_ENABLED` | `true` | Enable live voice call dispatching via OmniDimension API |
-| `EMAIL_SENDING_ENABLED` | `true` | Enable live SMTP email outreach; previews remain available |
+|---|---|---|
+| `LEADSUTRA_ENABLE_GOOGLE_PLACES` | `true` | Enable Google Places API discovery |
+| `LEADSUTRA_ENABLE_MAPS_BROWSER` | `true` | Enable Playwright-based Maps scraping |
+| `LEADSUTRA_ENABLE_MAPS_BROWSER_FALLBACK` | `false` | Use browser scraping after retryable Places API errors |
+| `LEADSUTRA_MAPS_FALLBACK_ON_ZERO_RESULTS` | `false` | Use browser scraping when Places returns zero leads |
+| `OUTBOUND_CALLS_ENABLED` | `true` | Enable live voice call dispatch |
+| `EMAIL_SENDING_ENABLED` | `true` | Enable live SMTP email sending |
 
-### Live SMTP Settings
+### Gmail SMTP Configuration
 
 ```env
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURITY=starttls
-SMTP_USERNAME=leadsutraai.work@gmail.com
+SMTP_USERNAME=your_email@gmail.com
 SMTP_PASSWORD=your_16_character_app_password
-SMTP_FROM_ADDRESS=leadsutraai.work@gmail.com
+SMTP_FROM_ADDRESS=your_email@gmail.com
 SMTP_TIMEOUT_SECONDS=15
 EMAIL_SENDING_ENABLED=true
 ```
 
-> [!IMPORTANT]
-> **Gmail Configuration**: Gmail SMTP requires a 16-character **Google App Password** generated under *Google Account Security → 2-Step Verification → App passwords*. Standard account passwords will be rejected with HTTP 535 authentication errors.
+> **Security:** Use a Google App Password generated after enabling 2-Step Verification. Do not commit `.env`, passwords, API keys, or tokens to GitHub. Keep `.env.example` limited to placeholder values.
 
----
-
-## 📦 Pipeline & System Architecture
+## 📦 Project Structure
 
 ```text
 app/
 ├── agents/
-│   ├── lead_pipeline/      # Discovery, Enrichment, Scoring & Qualification engine
-│   ├── email/              # Email draft formatting & RFC 2822 Message-ID construction
-│   └── voice/              # Outbound voice calling agent context & prompts
+│   ├── lead_pipeline/    # Discovery, enrichment, scoring, qualification
+│   ├── email/            # Email drafts and Message-ID construction
+│   └── voice/            # Voice agent context and prompts
 ├── api/
-│   ├── router.py           # Master API router
-│   └── v1/                 # Endpoints: /leads, /calls, /calling-eligibility, /emails
+│   ├── router.py         # Master API router
+│   └── v1/               # Versioned API endpoints
 ├── core/
-│   └── config.py           # Pydantic BaseSettings & EmailSettings configuration
+│   └── config.py         # Application settings
 ├── integrations/
-│   ├── google_places.py    # Google Places API client
-│   ├── maps_scraper.py     # Playwright Google Maps browser scraper
-│   ├── website_fetcher.py  # Async web crawler & HTML parser
-│   ├── omnidimension.py    # OmniDimension Voice SDK integration
-│   └── smtp.py             # Authenticated SMTP provider with TLS verification
-├── schemas/                # Pydantic response & request validation models
-├── services/               # Lead, Call, Proposal, and Email persistence & orchestration
-└── utils/                  # Safe HTTP transport & DNS-rebinding protection
+│   ├── google_places.py  # Google Places API client
+│   ├── maps_scraper.py   # Playwright Maps scraper
+│   ├── website_fetcher.py# Website crawling and HTML parsing
+│   ├── omnidimension.py  # Voice provider integration
+│   └── smtp.py           # SMTP integration
+├── schemas/              # Request and response models
+├── services/             # Persistence and workflow orchestration
+└── utils/                # Safe HTTP transport and DNS protection
 ```
 
----
+## 🔍 API Overview
 
-## 🔍 API Endpoints Overview
+### 1. Lead Discovery
 
-### 1. Lead Discovery (`POST /api/v1/leads/discover`)
+`POST /api/v1/leads/discover`
+
+Example request:
+
 ```json
 {
   "query": "digital marketing agency",
@@ -108,97 +104,156 @@ app/
 }
 ```
 
-The final response and newly saved `leads.json` records omit
-`discovery.sub_category`, `discovery.source_ref`, `enrichment.final_url`, and
-`enrichment.operating_hours`. Discovery still includes `source_url` and `website`;
-enrichment still includes `website_url` and `website_status`. Website validation,
-redirects, fetching, and website-based enrichment are unchanged.
+The response and newly saved `leads.json` records omit these fields:
 
-Internal `sub_category` remains a scoring fallback, `source_ref` supports
-provenance and listing-contact fallback, and operating-hours evidence still feeds
-the existing score. Neither discovery provider scrapes `sub_category`. The crawler
-uses resolved page URLs for validation and enrichment without storing a separate
-`final_url`. Older saved runs remain readable; reserialization omits the retired
-fields without rewriting historical files.
+- `discovery.sub_category`
+- `discovery.source_ref`
+- `enrichment.final_url`
+- `enrichment.operating_hours`
 
-### 2. Email Outreach Flow
-1. **Preview Draft (`POST /api/v1/emails/preview`)**:
-   Generates draft subject, recipient, body, RFC 2822 `Message-ID`, and SHA256 `review_id`.
-2. **Approve Draft (`PUT /api/v1/emails/approval`)**:
-   Requires `lead_id`, `review_id`, and `approved: true`.
-3. **Dispatch Email (`POST /api/v1/emails/send`)**:
-   Queues background send task via `FastAPI BackgroundTasks`. Returns HTTP 202 `pending`.
-4. **Check Result (`GET /api/v1/emails/{email_id}`)**:
-   Retrieves SQLite result (`sent`, `pending`, `failed`, or `uncertain`).
+The discovery section retains `source_url` and `website`. The enrichment section retains `website_url` and `website_status`.
 
-### 3. Stored Lead Search (`GET /api/v1/leads`)
+The existing internal behavior remains unchanged:
 
-Requires a reviewer or admin bearer token. Reads the configured `LEAD_JSON_PATH`
-(directory of published runs or a canonical JSON file) without invoking discovery,
-scraping, enrichment, or scoring. The newest artifact by modification time wins
-for each `lead_id`; ties use the artifact path, and records retain order within a run.
+- `sub_category` remains available as a scoring fallback.
+- `source_ref` supports provenance and listing-contact fallback.
+- Operating-hours evidence continues to contribute to scoring.
+- Website validation, redirects, fetching, and website-based enrichment remain unchanged.
+- The crawler uses resolved page URLs during validation and enrichment without storing a separate `final_url`.
+- Older saved runs remain readable. Reserialization omits retired fields without rewriting historical files.
 
-Parameters: `q` (case-insensitive substring in business name, address, category,
-listing/enriched phones, and website URLs), `category` (trimmed, case-insensitive
-exact match), `qualification_status` (`Qualified`, `Needs Review`, `Not Qualified`,
-`Unknown`), `priority` (`High`, `Medium`, `Low`, `Unknown`), `limit` (default 25,
-1-100), and `offset` (default 0, 0-1,000,000). Search text and category are limited
-to 256 characters. Filters combine with AND; `total` counts matches before pagination.
+### 2. Email Outreach
 
-Response: `{"items": [], "total": 0, "limit": 25, "offset": 0}`. Each item uses the
-existing `lead_id`, `discovery`, `enrichment`, and `scoring` contract. Missing/empty
-storage and no matches produce an empty page. Invalid or unreadable artifacts
-return 503 without revealing file contents. Every request scans the saved JSON;
-there is no index or transactional snapshot across multiple run files.
+| Step | Endpoint | Purpose |
+|---|---|---|
+| Preview | `POST /api/v1/emails/preview` | Generate a draft, recipient, subject, body, Message-ID, and SHA-256 `review_id` |
+| Approve | `PUT /api/v1/emails/approval` | Approve a draft using `lead_id`, `review_id`, and `approved: true` |
+| Send | `POST /api/v1/emails/send` | Queue a background send task and return HTTP `202` with `pending` status |
+| Check result | `GET /api/v1/emails/{email_id}` | Retrieve the email result from SQLite |
 
-### 4. Email History (`GET /api/v1/emails`)
+### 3. Stored Lead Search
 
-Requires the existing email admin bearer token. Parameters: `status` (`pending`,
-`sending`, `sent`, `failed`, `uncertain`), `limit` (default 25, 1-100), and `offset`
-(default 0, 0-1,000,000). Reads the existing `email_results` SQLite table, ordered
-by `created_at` descending and `email_id` for ties. `total` counts matching rows.
+`GET /api/v1/leads`
 
-Response: `{"emails": [], "total": 0, "limit": 25, "offset": 0}`. Items reuse the
-email-result fields: `email_id`, `lead_id`, `review_id`, `business_name`, `recipient`,
-`sender`, `proposal_file`, `status`, `created_at`, `sent_at`, `message_id`, and `error`.
-Known workflow error codes remain visible; other error text becomes
-`email_error_details_unavailable`. `sent` means SMTP acceptance, not confirmed
-recipient delivery. Queued, failed, and uncertain records are never labeled delivered.
-Existing email detail, approval, and sending endpoints retain their contracts.
-Retries update the existing review record, so history shows current state rather
-than a separate row per attempt.
+Requires a reviewer or admin bearer token.
 
----
+Searches stored lead artifacts without rerunning discovery, scraping, enrichment, or scoring.
 
-## 🔁 Email Retry & Observability Architecture
+**Query parameters**
 
-- **RFC 2822 Message-ID**: Automatically generated via Python stdlib `email.utils.make_msgid()` before send and persisted upon SMTP acceptance.
-- **Safe Structured Logging**: Loggers `leadsutra.email` and `leadsutra.smtp` log connection metadata and exact error tracebacks safely **without leaking SMTP passwords or API tokens**.
-- **Idempotent Retry**:
-  - **`failed` / `uncertain` records**: Calling `POST /api/v1/emails/send` atomically resets the record to `pending` and queues a new SMTP send attempt, preserving the original `email_id` and unique `review_id`.
-  - **`sent` / `pending` / `sending` records**: Duplicate sends are suppressed to prevent accidental double-sending.
+| Parameter | Description |
+|---|---|
+| `q` | Case-insensitive substring search across business name, address, category, phone numbers, and website URLs |
+| `category` | Trimmed, case-insensitive exact match |
+| `qualification_status` | `Qualified`, `Needs Review`, `Not Qualified`, or `Unknown` |
+| `priority` | `High`, `Medium`, `Low`, or `Unknown` |
+| `limit` | Page size; default `25`, range `1–100` |
+| `offset` | Pagination offset; default `0`, range `0–1,000,000` |
 
----
+Search text and category are limited to 256 characters. Filters combine using AND logic, and `total` counts matching records before pagination.
+
+**Response shape**
+
+```json
+{
+  "items": [],
+  "total": 0,
+  "limit": 25,
+  "offset": 0
+}
+```
+
+The configured `LEAD_JSON_PATH` can reference a directory of published runs or a canonical JSON file. When multiple artifacts contain the same `lead_id`, the newest artifact by modification time takes precedence; ties are resolved by artifact path. Record order within a run is preserved.
+
+Missing or empty storage and no matches return an empty page. Invalid or unreadable artifacts return HTTP `503` without exposing file contents.
+
+**Implementation note:** Each request scans the saved JSON artifacts. There is no index or transactional snapshot across multiple run files.
+
+### 4. Email History
+
+`GET /api/v1/emails`
+
+Requires the existing email admin bearer token.
+
+**Query parameters**
+
+| Parameter | Description |
+|---|---|
+| `status` | Filter by `pending`, `sending`, `sent`, `failed`, or `uncertain` |
+| `limit` | Page size; default `25`, range `1–100` |
+| `offset` | Pagination offset; default `0`, range `0–1,000,000` |
+
+Results are read from the existing `email_results` SQLite table and ordered by `created_at` descending, with `email_id` used to break ties.
+
+**Response shape**
+
+```json
+{
+  "emails": [],
+  "total": 0,
+  "limit": 25,
+  "offset": 0
+}
+```
+
+Each item reuses the existing email-result fields:
+
+- `email_id`, `lead_id`, `review_id`
+- `business_name`, `recipient`, `sender`
+- `proposal_file`, `status`
+- `created_at`, `sent_at`, `message_id`, `error`
+
+Known workflow error codes remain visible. Other error details are replaced with `email_error_details_unavailable`.
+
+> **Delivery semantics:** `sent` means the SMTP server accepted the message. It does not confirm delivery to the recipient's inbox. Queued, failed, and uncertain messages are not marked as delivered.
+
+Retries update the existing review record, so history shows the current state rather than creating a separate record for each attempt. Existing email detail, approval, and sending endpoint contracts remain unchanged.
+
+## 🔁 Email Retry & Observability
+
+### Message Identification
+
+- Generates RFC 2822 `Message-ID` values using Python's `email.utils.make_msgid()`.
+- Persists the Message-ID upon SMTP acceptance.
+
+### Structured Logging
+
+The `leadsutra.email` and `leadsutra.smtp` loggers capture connection metadata and error tracebacks without exposing SMTP passwords or API tokens.
+
+### Retry and Idempotency
+
+| Current status | Behavior on another send request |
+|---|---|
+| `failed` / `uncertain` | Atomically reset to `pending` and queue another SMTP attempt |
+| `sent` | Suppress duplicate sending |
+| `pending` / `sending` | Suppress duplicate sending |
+
+Retries preserve the original `email_id` and unique `review_id`.
 
 ## 🧪 Testing & Verification
 
-Run the full automated test suite:
+Run commands from the `backend` directory.
+
+**Full automated test suite**
 
 ```powershell
 .\venv\Scripts\python.exe -B -m unittest discover -s tests -v
 ```
 
-Run explicit module import verification:
+**Module import verification**
 
 ```powershell
 .\venv\Scripts\python.exe -B -m tests.test_imports
 ```
 
-Run email integration test suite:
+**Email integration tests**
 
 ```powershell
 .\venv\Scripts\python.exe -B -m unittest tests/test_email_integration.py
 ```
 
-> [!NOTE]
-> All automated unit tests use mocked socket connections and mocked providers. **No real network calls or emails are sent during automated testing.**
+> **Testing note:** Automated tests use mocked socket connections and mocked providers. They do not send real emails or make real network calls.
+
+---
+
+*LeadSutra AI Backend | API, data enrichment, qualification, scoring, voice, and email workflows.*
