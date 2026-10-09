@@ -1,0 +1,19 @@
+# LeadSutra AI Backend Dependencies
+
+# Web Application Framework & Server
+fastapi==0.142.2
+uvicorn==0.54.0
+
+# Data Validation & Settings Management
+pydantic==2.13.5
+pydantic-settings==2.15.0
+python-dotenv==1.2.4
+
+# HTTP Transport & Web Crawling
+httpx==0.28.1
+requests==2.34.2
+beautifulsoup4==4.15.0
+playwright==1.63.0
+
+# Voice Calling Integration
+omnidimension==0.4.2
