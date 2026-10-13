@@ -401,31 +401,15 @@ class WebsiteCrawler:
             if (requests > 40 or request.method != "GET"
                     or request.resource_type in {"image", "media", "font"}
                     or (request.is_navigation_request() and not _same_site(host, urlparse(request.url).hostname or ""))):
-                try:
-                    await route.abort()
-                except PlaywrightError:
-                    # The page may be closing while browser requests remain in flight.
-                    pass
+                await route.abort()
                 return
             try:
                 response = await self._fetch(client, request.url, host if request.is_navigation_request() else None)
                 await route.fulfill(status=response.status_code, headers=dict(response.headers), body=response.content)
-            except PlaywrightError as exc:
-                if "closed" in str(exc).casefold():
-                    return
-                result.crawl_errors.append(CrawlError(url=request.url, message=f"Browser resource failed: {type(exc).__name__}: {exc}"))
-                logger.warning("Browser resource blocked or failed: %s", type(exc).__name__)
-                try:
-                    await route.abort()
-                except PlaywrightError:
-                    pass
             except Exception as exc:
                 result.crawl_errors.append(CrawlError(url=request.url, message=f"Browser resource failed: {type(exc).__name__}: {exc}"))
                 logger.warning("Browser resource blocked or failed: %s", type(exc).__name__)
-                try:
-                    await route.abort()
-                except PlaywrightError:
-                    pass
+                await route.abort()
 
         await manager.context.route("**/*", route_request)
         await manager.context.route_web_socket("**/*", lambda socket: socket.close())

@@ -15,7 +15,7 @@ from app.schemas.call_history import CallHistoryItem, CallHistoryPage
 from app.services.outreach_repository import DispatchLedger
 from app.services.voice_service import dispatch_voice_call
 
-router = APIRouter(prefix="/calls", tags=["Voice"])
+router = APIRouter(prefix="/calls", tags=["calls"])
 
 
 @router.get(

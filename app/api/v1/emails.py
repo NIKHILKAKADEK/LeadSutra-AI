@@ -15,7 +15,7 @@ from app.schemas.email import (
 from app.services.email_service import EmailService, EmailWorkflowError, get_email_service
 
 
-router = APIRouter(prefix="/emails", tags=["Email"], dependencies=[Depends(require_admin)])
+router = APIRouter(prefix="/emails", tags=["emails"], dependencies=[Depends(require_admin)])
 
 
 def _error(exc: EmailWorkflowError) -> HTTPException:

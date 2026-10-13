@@ -45,26 +45,11 @@ class BrowserManager:
 
     async def close(self) -> None:
         if self.context is not None:
-            try:
-                await self.context.unroute_all(behavior="ignoreErrors")
-            except Exception:
-                # Context shutdown must continue even when an in-flight route
-                # callback has already lost its page or browser target.
-                pass
-            try:
-                await self.context.close()
-            except Exception:
-                pass
+            await self.context.close()
         if self.browser is not None:
-            try:
-                await self.browser.close()
-            except Exception:
-                pass
+            await self.browser.close()
         if self._playwright is not None:
-            try:
-                await self._playwright.stop()
-            except Exception:
-                pass
+            await self._playwright.stop()
         self.page = self.context = self.browser = self._playwright = None
 
     async def __aenter__(self) -> "BrowserManager":
