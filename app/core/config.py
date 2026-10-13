@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     lead_json_path: str = str(_BACKEND / "app/results/leads")
     eligibility_db_path: str = str(_BACKEND / "app/results/calls/calling_eligibility.sqlite3")
     proposal_root: str = str(_BACKEND / "app/results/proposals")
+    research_root: str = str(_BACKEND / "app/results/research")
     eligibility_admin_token: str | None = None
     eligibility_reviewer_token: str | None = None
 

@@ -1319,6 +1319,11 @@ def detect_technologies(website: WebsiteCrawlResult) -> TechnologyExtraction:
 def canonical_lead_output(lead: Any) -> LeadResult:
     """Map existing extracted facts to the new API contract without re-extracting."""
     data = _as_dict(lead)
+    # Saved and API-facing records already use the canonical contract. Preserve
+    # that shape instead of treating them as legacy extraction records.
+    if isinstance(data.get("discovery"), dict):
+        return LeadResult.model_validate(data)
+
     business = _as_dict(data.get("business"))
     profile = _as_dict(data.get("profile"))
     website = _as_dict(data.get("website_analysis"))
