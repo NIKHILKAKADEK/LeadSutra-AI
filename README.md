@@ -89,6 +89,18 @@ app/
 
 ## 🔍 API Overview
 
+### Independent AI Agents
+
+Research, knowledge retrieval, and outreach proposal generation are separate operations. Each endpoint runs only its own agent; pass results between calls explicitly. There is no automatic agent orchestration.
+
+| Endpoint | Input | Output |
+|---|---|---|
+| `POST /api/v1/research/analyze` | A discovered lead object, or `{ "lead_id": "..." }` | Grounded business research |
+| `POST /api/v1/rag/retrieve` | `{ "query": "...", "k": 3 }` | Matching knowledge documents and sources |
+| `POST /api/v1/proposals/generate` | A lead object or lead ID; optional `research` and `retrieved_context` | Outreach angle, email subjects and draft, call opener, discovery questions, and proposal details |
+
+To prepare outreach, call research first, retrieve knowledge with a query you choose, then pass the lead and whichever results are relevant to proposal generation. If no documented business need exists, the proposal provides neutral, permission-based outreach rather than inventing a pain point.
+
 ### 1. Lead Discovery
 
 `POST /api/v1/leads/discover`

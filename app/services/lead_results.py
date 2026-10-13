@@ -79,6 +79,26 @@ class LeadResultStore:
         path = self.root / UUID(str(run_id)).hex / "leads.json"
         return self._load_path(path)
 
+    def get_by_id(self, lead_id: str) -> LeadResult | None:
+        """Return the newest saved canonical lead matching its stable ID."""
+        if self.root.is_file():
+            paths = [self.root]
+        elif self.root.is_dir():
+            paths = sorted(
+                (path for path in self.root.glob("*/leads.json")
+                 if not path.parent.name.startswith(".")),
+                key=lambda path: (path.stat().st_mtime_ns, str(path)),
+                reverse=True,
+            )
+        else:
+            return None
+
+        for path in paths:
+            for lead in self._load_path(path):
+                if lead.lead_id == lead_id:
+                    return lead
+        return None
+
     @staticmethod
     def _load_path(path: Path) -> list[LeadResult]:
         leads = _LEAD_RESULTS.validate_json(path.read_text(encoding="utf-8-sig"))

@@ -23,7 +23,7 @@ from app.services.leads import LeadJsonService
 
 router = APIRouter(
     prefix="/calling-eligibility",
-    tags=["calling-eligibility"],
+    tags=["Voice"],
 )
 bearer_scheme = HTTPBearer(
     auto_error=False,

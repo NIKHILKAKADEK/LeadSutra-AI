@@ -16,7 +16,12 @@ from app.core.config import DiscoverySettings
 
 class StrictOutputModel(BaseModel):
     model_config = ConfigDict(
-        extra="forbid"
+        extra="forbid",
+        # These contracts are serialized to clients and reused as request
+        # bodies (for example, when generating a proposal for a saved lead).
+        # Keep one stable OpenAPI schema instead of Pydantic's split
+        # validation/serialization variants.
+        json_schema_mode_override="serialization",
     )
 
 
@@ -416,6 +421,7 @@ class LeadDiscoveryRequest(StrictOutputModel):
 
 
 class DiscoveryData(BusinessRecord):
+    model_config = ConfigDict(json_schema_mode_override="serialization")
     # The existing business fields/validators are reused; the ID lives at the root.
     lead_id: str | None = Field(default=None, exclude=True)
     # Scoring fallback and provenance remain internal, like provider metadata.
@@ -435,6 +441,7 @@ class EnrichmentSocialLinks(SocialLinksSection):
 
 
 class EnrichmentData(ContactsSection):
+    model_config = ConfigDict(json_schema_mode_override="serialization")
     website_status: str = "not_checked"
     website_url: str | None = None
     about: str = ""
@@ -457,6 +464,7 @@ class EnrichmentData(ContactsSection):
 
 
 class ScoringData(ScoringSection):
+    model_config = ConfigDict(json_schema_mode_override="serialization")
     score_breakdown: dict[str, Any] = Field(default_factory=dict, exclude=True)
 
 
