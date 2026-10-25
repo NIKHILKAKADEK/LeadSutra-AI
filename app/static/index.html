@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LeadSutra AI — Autonomous Multi-Agent Sales Platform</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+    .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    .glass-card { background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); }
+    .badge-qualified { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .badge-review { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .gradient-text { background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .detail-copy { margin-top: .35rem; color: #94a3b8; font-size: .8rem; line-height: 1.65; white-space: pre-wrap; }
+    .detail-label { color: #cbd5e1; font-size: .75rem; font-weight: 600; }
+    .detail-list { margin-top: .35rem; display: grid; gap: .35rem; color: #94a3b8; font-size: .8rem; line-height: 1.55; list-style: disc; list-style-position: inside; }
+    .detail-input { width: 100%; margin-top: .35rem; border: 1px solid #334155; border-radius: .75rem; background: #0f172a; padding: .7rem; color: #e2e8f0; font-size: .8rem; outline: none; }
+    .detail-input:focus { border-color: #34d399; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Navbar -->
+  <header class="glass sticky top-0 z-50 border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+    <div class="flex items-center space-x-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-sky-500/20">
+        <i class="fa-solid fa-chart-line text-white text-lg"></i>
+      </div>
+      <div>
+        <h1 class="text-xl font-bold tracking-tight flex items-center gap-2">
+          LeadSutra <span class="gradient-text font-extrabold">AI</span>
+          <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-medium">LangGraph 1.2</span>
+        </h1>
+        <p class="text-xs text-slate-400">Autonomous Multi-Agent Sales Orchestrator</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-4 text-xs">
+      <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800/80 border border-slate-700">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-slate-300">Orchestrator: <b class="text-emerald-400">Active</b></span>
+      </div>
+      <a href="/docs" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+        <i class="fa-solid fa-book-open mr-1"></i> API Docs
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-8">
+
+    <!-- Stepper Navigation -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-medium">
+      <div id="step-nav-1" class="p-3 rounded-xl border border-sky-500/50 bg-sky-500/10 text-sky-300 flex items-center gap-3">
+        <span class="w-6 h-6 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold">1</span>
+        <div><p class="font-bold">Discovery</p><p class="text-[11px] text-slate-400">Query & Places</p></div>
+      </div>
+      <div id="step-nav-2" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 text-slate-400 flex items-center gap-3">
+        <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold">2</span>
+        <div><p class="font-bold">Selection</p><p class="text-[11px] text-slate-500">Pick Target Lead</p></div>
+      </div>
+      <div id="step-nav-3" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 text-slate-400 flex items-center gap-3">
+        <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold">3</span>
+        <div><p class="font-bold">Research & RAG</p><p class="text-[11px] text-slate-500">Deep Grounding</p></div>
+      </div>
+      <div id="step-nav-4" class="p-3 rounded-xl border border-slate-800 bg-slate-900/60 text-slate-400 flex items-center gap-3">
+        <span class="w-6 h-6 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center font-bold">4</span>
+        <div><p class="font-bold">Proposal & Outreach</p><p class="text-[11px] text-slate-500">Review & Send</p></div>
+      </div>
+    </div>
+
+    <!-- Alert / Status Banner -->
+    <div id="status-banner" class="hidden p-4 rounded-xl border text-sm flex items-start gap-3 transition-all"></div>
+
+    <!-- Section 1: Lead Discovery Form -->
+    <section class="glass-card rounded-2xl p-6 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <i class="fa-solid fa-compass text-sky-400"></i> Stage A: Business Lead Discovery
+          </h2>
+          <p class="text-xs text-slate-400">Enter a natural-language query or search parameters. Google Places API with browser scraper fallback will discover, enrich, and score matching businesses.</p>
+        </div>
+      </div>
+
+      <form id="search-form" class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div class="md:col-span-6 space-y-1">
+            <label class="text-xs font-semibold text-slate-300">Natural-Language Query / Category</label>
+            <div class="relative">
+              <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-500 text-sm"></i>
+              <input type="text" id="input-query" placeholder="e.g. Find software development companies in Nashik" required
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-sm">
+            </div>
+          </div>
+          <div class="md:col-span-3 space-y-1">
+            <label class="text-xs font-semibold text-slate-300">Explicit Location (Optional)</label>
+            <div class="relative">
+              <i class="fa-solid fa-location-dot absolute left-3.5 top-3.5 text-slate-500 text-sm"></i>
+              <input type="text" id="input-location" placeholder="e.g. Nashik"
+                class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 text-sm">
+            </div>
+          </div>
+          <div class="md:col-span-3 space-y-1">
+            <label class="text-xs font-semibold text-slate-300">Lead Limit</label>
+            <select id="input-limit" class="w-full px-3 py-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-100 focus:outline-none focus:border-sky-500 text-sm">
+              <option value="5">5 Leads</option>
+              <option value="10" selected>10 Leads</option>
+              <option value="20">20 Leads</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+          <div class="flex items-center gap-2 text-xs text-slate-400">
+            <i class="fa-solid fa-bolt text-amber-400"></i>
+            <span>Places API + Playwright browser fallback enabled</span>
+          </div>
+          <button type="submit" id="btn-discover" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-medium text-sm flex items-center gap-2 shadow-lg shadow-sky-500/25 transition">
+            <span>Discover Leads</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Loading Indicator -->
+    <div id="loader-panel" class="hidden glass-card rounded-2xl p-8 text-center space-y-4">
+      <div class="w-12 h-12 border-4 border-sky-500/30 border-t-sky-500 rounded-full animate-spin mx-auto"></div>
+      <div>
+        <p id="loader-title" class="font-bold text-slate-200 text-base">Orchestrator Executing Workflow...</p>
+        <p id="loader-subtitle" class="text-xs text-slate-400 mt-1">Calling Google Places and ranking candidates...</p>
+      </div>
+      <div class="w-full max-w-md mx-auto bg-slate-800 rounded-full h-1.5 overflow-hidden">
+        <div class="bg-gradient-to-r from-sky-400 to-indigo-500 h-1.5 rounded-full animate-pulse w-3/4"></div>
+      </div>
+    </div>
+
+    <!-- Section 2: Discovered Leads Grid -->
+    <section id="leads-section" class="hidden space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div>
+          <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+            <i class="fa-solid fa-building text-indigo-400"></i> Discovered Business Leads
+            <span id="leads-count-badge" class="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 text-xs font-semibold">0</span>
+          </h2>
+          <p class="text-xs text-slate-400">Select one business to initiate deep website research, RAG indexing, and tailored proposal generation.</p>
+        </div>
+        <div id="active-workflow-badge" class="text-xs px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 border border-slate-700 font-mono"></div>
+      </div>
+
+      <div id="leads-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- Section 3 & 4: Deep Research, RAG, and Proposal Output -->
+    <section id="analysis-section" class="hidden space-y-6">
+
+      <!-- Selected Business Banner -->
+      <div class="glass-card rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-l-indigo-500">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-400">Selected Target Business</span>
+          <h3 id="target-biz-name" class="text-xl font-bold text-slate-100">Business Name</h3>
+          <p id="target-biz-category" class="text-xs text-slate-400 mt-0.5">Category • Address</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div id="target-biz-score" class="text-center px-4 py-2 rounded-xl bg-slate-800/80 border border-slate-700">
+            <span class="block text-lg font-extrabold text-emerald-400">--</span>
+            <span class="text-[10px] text-slate-400 uppercase font-bold">Lead Score</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="grid grid-cols-3 gap-2" aria-label="Selected lead details">
+        <button type="button" data-analysis-tab="research" class="analysis-tab rounded-xl border border-sky-500/50 bg-sky-500/10 px-4 py-3 text-sm font-semibold text-sky-300">Research Details</button>
+        <button type="button" data-analysis-tab="proposal" class="analysis-tab rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-400">Proposal Details</button>
+        <button type="button" data-analysis-tab="outreach" class="analysis-tab rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 text-sm font-semibold text-slate-400">Outreach</button>
+      </nav>
+
+      <div class="space-y-6">
+
+        <!-- Left Column: Business Research & RAG Knowledge (7 cols) -->
+        <div id="research-view" data-analysis-panel="research" class="space-y-6">
+
+          <!-- Research Card -->
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <h4 class="text-sm font-bold text-slate-200 flex items-center justify-between">
+              <span class="flex items-center gap-2"><i class="fa-solid fa-magnifying-glass-chart text-sky-400"></i> Grounded Business Research</span>
+              <span class="text-xs font-normal text-slate-400"><i class="fa-solid fa-shield-halved text-emerald-400 mr-1"></i> Factual Grounding</span>
+            </h4>
+
+            <div class="space-y-3 text-xs">
+              <div>
+                <p class="font-semibold text-slate-300">Executive Summary</p>
+                <p id="res-summary" class="text-slate-400 mt-1 leading-relaxed bg-slate-900/50 p-3 rounded-xl border border-slate-800/80">--</p>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div>
+                  <p class="font-semibold text-slate-300">Identified Services / Products</p>
+                  <ul id="res-services" class="list-disc list-inside text-slate-400 mt-1 space-y-0.5"></ul>
+                </div>
+                <div>
+                  <p class="font-semibold text-slate-300">Target Customers & ICP</p>
+                  <p id="res-target" class="text-slate-400 mt-1">--</p>
+                </div>
+              </div>
+
+              <!-- SWOT Strengths -->
+              <div class="pt-2">
+                <p class="font-semibold text-slate-300">Business Strengths & Evidence</p>
+                <div id="res-strengths" class="flex flex-wrap gap-1.5 mt-1.5"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="glass-card rounded-2xl p-5"><h4 class="text-sm font-bold text-slate-200">Pain Points</h4><ul id="res-pain-points" class="detail-list"></ul></div>
+            <div class="glass-card rounded-2xl p-5"><h4 class="text-sm font-bold text-slate-200">Sales Opportunities</h4><ul id="res-opportunities" class="detail-list"></ul></div>
+            <div class="glass-card rounded-2xl p-5"><h4 class="text-sm font-bold text-slate-200">Ideal Customer Profile</h4><p id="res-icp" class="detail-copy"></p></div>
+            <div class="glass-card rounded-2xl p-5"><h4 class="text-sm font-bold text-slate-200">Decision Maker</h4><p id="res-decision-maker" class="detail-copy"></p></div>
+          </div>
+          <div class="glass-card rounded-2xl p-5 space-y-3">
+            <h4 class="text-sm font-bold text-slate-200">Full SWOT Analysis</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div><p class="detail-label text-emerald-300">Strengths</p><ul id="res-swot-strengths" class="detail-list"></ul></div>
+              <div><p class="detail-label text-amber-300">Weaknesses</p><ul id="res-swot-weaknesses" class="detail-list"></ul></div>
+              <div><p class="detail-label text-sky-300">Opportunities</p><ul id="res-swot-opportunities" class="detail-list"></ul></div>
+              <div><p class="detail-label text-rose-300">Threats</p><ul id="res-swot-threats" class="detail-list"></ul></div>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="glass-card rounded-2xl p-5"><h4 class="text-sm font-bold text-slate-200">Provided Facts</h4><ul id="res-facts" class="detail-list"></ul></div>
+            <div class="glass-card rounded-2xl p-5"><h4 class="text-sm font-bold text-slate-200">Reasonable Inferences</h4><ul id="res-inferences" class="detail-list"></ul></div>
+            <div class="glass-card rounded-2xl p-5"><h4 class="text-sm font-bold text-slate-200">Missing Information</h4><ul id="res-missing" class="detail-list"></ul></div>
+          </div>
+
+          <!-- RAG Chunks Card -->
+          <div class="glass-card rounded-2xl p-6 space-y-3">
+            <h4 class="text-sm font-bold text-slate-200 flex items-center justify-between">
+              <span class="flex items-center gap-2"><i class="fa-solid fa-database text-purple-400"></i> Grounded RAG Knowledge Retrieved</span>
+              <span class="text-xs text-purple-300 bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">ChromaDB Filtered</span>
+            </h4>
+            <p class="text-xs text-slate-400">Relevant knowledge documents and crawled website text retrieved strictly for this lead:</p>
+            <div id="rag-context-list" class="space-y-2 text-xs">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+
+        </div>
+
+        <div id="proposal-view" data-analysis-panel="proposal" class="hidden space-y-6">
+
+          <!-- Proposal Card -->
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+                <i class="fa-solid fa-file-signature text-emerald-400"></i> Proposal Details
+              </h4>
+              <span id="approval-pill" class="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium">Pending Review</span>
+            </div>
+
+            <div class="space-y-3 text-xs">
+              <div><p class="detail-label">Business Summary</p><p id="prop-summary" class="detail-copy"></p></div>
+              <div><p class="detail-label">Identified Needs</p><ul id="prop-needs" class="detail-list"></ul></div>
+              <div>
+                <label class="block font-semibold text-slate-300">Proposed Solution</label>
+                <textarea id="prop-solution" rows="3" class="w-full mt-1 p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 text-xs focus:outline-none focus:border-emerald-500"></textarea>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><p class="detail-label">Deliverables</p><ul id="prop-deliverables" class="detail-list"></ul></div>
+                <div><p class="detail-label">Implementation Timeline</p><ul id="prop-timeline" class="detail-list"></ul></div>
+                <div><p class="detail-label">Expected Benefits</p><ul id="prop-benefits" class="detail-list"></ul></div>
+                <div><p class="detail-label">Pricing</p><p id="prop-pricing" class="detail-copy"></p></div>
+                <div><p class="detail-label">Next Steps</p><ul id="prop-next-steps" class="detail-list"></ul></div>
+                <div><p class="detail-label">Outreach Angle</p><p id="prop-angle" class="detail-copy"></p></div>
+              </div>
+            </div>
+
+            <!-- Approval Action -->
+            <div class="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+              <button id="btn-approve" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-xs flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition">
+                <i class="fa-solid fa-check"></i>
+                <span>Approve Proposal</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="outreach-view" data-analysis-panel="outreach" class="hidden space-y-6">
+          <div class="glass-card rounded-2xl p-6 space-y-4">
+            <h4 class="text-sm font-bold text-slate-200">Outreach Draft</h4>
+            <p class="detail-label">Suggested Subject Lines</p><ul id="outreach-subject-options" class="detail-list"></ul>
+            <div><label for="prop-subject" class="detail-label">Email Subject</label><input type="text" id="prop-subject" class="detail-input"></div>
+            <div><label for="prop-email" class="detail-label">Email Body</label><textarea id="prop-email" rows="8" class="detail-input font-sans"></textarea></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><p class="detail-label">Call Opener</p><p id="outreach-call-opener" class="detail-copy"></p></div>
+              <div><p class="detail-label">Discovery Questions</p><ul id="outreach-questions" class="detail-list"></ul></div>
+            </div>
+          </div>
+
+          <!-- Outreach Action Card -->
+          <div id="outreach-panel" class="glass-card rounded-2xl p-6 space-y-4">
+            <h4 class="text-sm font-bold text-slate-200 flex items-center gap-2">
+              <i class="fa-solid fa-paper-plane text-sky-400"></i> Stage F: Authorize Outreach
+            </h4>
+            <p class="text-xs text-slate-400">External communications require explicit confirmation. Choose your configured outreach channel:</p>
+
+            <div class="space-y-3 text-xs">
+              <div class="grid grid-cols-2 gap-2">
+                <label class="p-3 rounded-xl border border-slate-700 bg-slate-900 flex items-center gap-2 cursor-pointer hover:border-sky-500">
+                  <input type="radio" name="outreach_channel" value="email" checked class="text-sky-500">
+                  <div><p class="font-bold text-slate-200">Email (SMTP)</p><p class="text-[10px] text-slate-400">Send verified email</p></div>
+                </label>
+                <label class="p-3 rounded-xl border border-slate-700 bg-slate-900 flex items-center gap-2 cursor-pointer hover:border-indigo-500">
+                  <input type="radio" name="outreach_channel" value="voice" class="text-indigo-500">
+                  <div><p class="font-bold text-slate-200">Voice (OmniDim)</p><p class="text-[10px] text-slate-400">AI Voice Calling</p></div>
+                </label>
+              </div>
+
+              <label class="flex items-start gap-2 pt-1 text-slate-300 cursor-pointer">
+                <input type="checkbox" id="chk-confirm" class="mt-0.5 rounded text-sky-500 focus:ring-0">
+                <span>I explicitly authorize LeadSutra AI to dispatch this outreach to the prospect.</span>
+              </label>
+
+              <button id="btn-dispatch" disabled class="w-full py-2.5 rounded-xl bg-slate-700 text-slate-400 font-medium text-xs flex items-center justify-center gap-2 cursor-not-allowed transition">
+                <i class="fa-solid fa-paper-plane text-xs"></i>
+                <span>Dispatch Outreach</span>
+              </button>
+
+              <div id="outreach-result-box" class="hidden p-3 rounded-xl border text-xs"></div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 text-center py-4 text-xs text-slate-500">
+    LeadSutra AI • LangGraph Multi-Agent Orchestration • Grounded Autonomous Sales Pipeline
+  </footer>
+
+  <!-- Application Logic -->
+  <script>
+    let currentWorkflowId = null;
+    let currentDiscoveredLeads = [];
+    let currentSelectedLead = null;
+
+    const el = (id) => document.getElementById(id);
+
+    function showStatus(message, type = 'info') {
+      const banner = el('status-banner');
+      banner.className = `p-4 rounded-xl border text-sm flex items-start gap-3 transition-all ${
+        type === 'error' ? 'bg-red-500/10 border-red-500/40 text-red-300' :
+        type === 'success' ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300' :
+        'bg-sky-500/10 border-sky-500/40 text-sky-300'
+      }`;
+      const icon = type === 'error' ? 'fa-triangle-exclamation' : type === 'success' ? 'fa-circle-check' : 'fa-circle-info';
+      banner.innerHTML = `<i class="fa-solid ${icon} mt-0.5 text-base"></i><div>${message}</div>`;
+      banner.classList.remove('hidden');
+    }
+
+    function hideStatus() {
+      el('status-banner').classList.add('hidden');
+    }
+
+    function setAnalysisTab(tab) {
+      document.querySelectorAll('[data-analysis-panel]').forEach((panel) => {
+        panel.classList.toggle('hidden', panel.dataset.analysisPanel !== tab);
+      });
+      document.querySelectorAll('.analysis-tab').forEach((button) => {
+        const active = button.dataset.analysisTab === tab;
+        button.className = `analysis-tab rounded-xl border px-4 py-3 text-sm font-semibold ${active
+          ? 'border-sky-500/50 bg-sky-500/10 text-sky-300'
+          : 'border-slate-700 bg-slate-900 text-slate-400 hover:text-slate-200'}`;
+      });
+    }
+
+    document.querySelectorAll('.analysis-tab').forEach((button) => {
+      button.addEventListener('click', () => setAnalysisTab(button.dataset.analysisTab));
+    });
+
+    function renderList(id, values, emptyText = 'No supported information available.') {
+      const list = el(id);
+      list.replaceChildren();
+      const items = Array.isArray(values) ? values : [];
+      (items.length ? items : [emptyText]).forEach((value) => {
+        const item = document.createElement('li');
+        item.textContent = value == null ? '' : String(value);
+        if (!items.length) item.className = 'list-none italic text-slate-500';
+        list.appendChild(item);
+      });
+    }
+
+    function setDetail(id, value, fallback = 'Not available in the supplied information.') {
+      el(id).textContent = value || fallback;
+    }
+
+    function setLoader(visible, title = '', subtitle = '') {
+      const loader = el('loader-panel');
+      if (visible) {
+        el('loader-title').textContent = title || 'Orchestrator Executing Workflow...';
+        el('loader-subtitle').textContent = subtitle || 'Coordinating AI agents through LangGraph...';
+        loader.classList.remove('hidden');
+      } else {
+        loader.classList.add('hidden');
+      }
+    }
+
+    function setStep(step) {
+      for (let i = 1; i <= 4; i++) {
+        const item = el(`step-nav-${i}`);
+        if (i < step) {
+          item.className = 'p-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 flex items-center gap-3';
+          item.querySelector('span').className = 'w-6 h-6 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs';
+          item.querySelector('span').innerHTML = '✓';
+        } else if (i === step) {
+          item.className = 'p-3 rounded-xl border border-sky-500/50 bg-sky-500/10 text-sky-300 flex items-center gap-3';
+          item.querySelector('span').className = 'w-6 h-6 rounded-full bg-sky-500 text-white flex items-center justify-center font-bold text-xs';
+          item.querySelector('span').innerHTML = i;
+        } else {
+          item.className = 'p-3 rounded-xl border border-slate-800 bg-slate-900/60 text-slate-500 flex items-center gap-3';
+          item.querySelector('span').className = 'w-6 h-6 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center font-bold text-xs';
+          item.querySelector('span').innerHTML = i;
+        }
+      }
+    }
+
+    // 1. Submit Discovery
+    el('search-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideStatus();
+      const query = el('input-query').value.trim();
+      const location = el('input-location').value.trim();
+      const limit = parseInt(el('input-limit').value);
+
+      if (!query) return;
+
+      setLoader(true, 'Discovering Businesses...', 'Executing Places API search and browser fallback...');
+      el('leads-section').classList.add('hidden');
+      el('analysis-section').classList.add('hidden');
+
+      try {
+        const resp = await fetch('/api/leads/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query, location: location || null, limit }),
+        });
+        const responseText = await resp.text();
+        let data;
+        try {
+          data = responseText ? JSON.parse(responseText) : {};
+        } catch {
+          data = { detail: responseText || 'Lead discovery returned an empty response.' };
+        }
+
+        if (!resp.ok) {
+          const detail = data.detail?.errors?.join(', ') || data.detail || 'Lead discovery failed';
+          throw new Error(typeof detail === 'string' ? detail : JSON.stringify(detail));
+        }
+
+        currentWorkflowId = data.workflow_id;
+        currentDiscoveredLeads = data.leads || [];
+        renderLeads(currentDiscoveredLeads);
+        setStep(2);
+        showStatus(`Discovered ${currentDiscoveredLeads.length} leads. Select one business below to begin deep research.`, 'success');
+      } catch (err) {
+        showStatus(`Discovery error: ${err.message}`, 'error');
+      } finally {
+        setLoader(false);
+      }
+    });
+
+    // 2. Render Leads
+    function renderLeads(leads) {
+      const grid = el('leads-grid');
+      grid.innerHTML = '';
+      el('leads-count-badge').textContent = leads.length;
+      el('active-workflow-badge').textContent = `WF: ${currentWorkflowId.substring(0, 8)}...`;
+
+      if (leads.length === 0) {
+        grid.innerHTML = `<div class="col-span-full p-8 text-center text-slate-400 glass-card rounded-2xl">No businesses discovered. Try broadening your query or location.</div>`;
+        el('leads-section').classList.remove('hidden');
+        return;
+      }
+
+      leads.forEach((lead) => {
+        const disc = lead.discovery || {};
+        const enrich = lead.enrichment || {};
+        const score = lead.scoring || {};
+        const isQualified = score.qualification_status === 'Qualified';
+
+        const card = document.createElement('div');
+        card.className = 'glass-card rounded-xl p-5 flex flex-col justify-between hover:border-slate-600 transition shadow-lg space-y-4';
+        card.innerHTML = `
+          <div class="space-y-2">
+            <div class="flex items-start justify-between gap-2">
+              <h4 class="font-bold text-sm text-slate-100 line-clamp-1">${disc.business_name || 'Business'}</h4>
+              <span class="text-[11px] px-2 py-0.5 rounded-full font-semibold ${isQualified ? 'badge-qualified' : 'badge-review'}">
+                ${score.qualification_status || 'Unscored'}
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 line-clamp-1"><i class="fa-solid fa-tag text-slate-500 mr-1"></i>${disc.category || 'Business'}</p>
+            <p class="text-xs text-slate-400 line-clamp-2"><i class="fa-solid fa-location-dot text-slate-500 mr-1"></i>${disc.address || 'Address not listed'}</p>
+
+            <div class="flex items-center gap-3 pt-1 text-xs text-slate-400">
+              ${disc.rating ? `<span><i class="fa-solid fa-star text-amber-400 mr-1"></i>${disc.rating}</span>` : ''}
+              ${disc.website ? `<a href="${disc.website}" target="_blank" class="text-sky-400 hover:underline line-clamp-1"><i class="fa-solid fa-globe mr-1"></i>Website</a>` : '<span class="text-slate-500">No website</span>'}
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-400">Score: ${score.lead_score ?? '--'}</span>
+            <button onclick="selectLead('${lead.lead_id}')" class="px-3.5 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-xs flex items-center gap-1.5 transition">
+              <span>Analyze</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+
+      el('leads-section').classList.remove('hidden');
+    }
+
+    // 3. Select Lead & Resume LangGraph Workflow
+    async function selectLead(leadId) {
+      hideStatus();
+      const lead = currentDiscoveredLeads.find(l => l.lead_id === leadId);
+      currentSelectedLead = lead;
+
+      setLoader(true, `Analyzing ${lead?.discovery?.business_name || 'Business'}...`, 'Website crawler scraping content, LangGraph Research Agent synthesizing facts, ChromaDB indexing RAG...');
+      el('analysis-section').classList.add('hidden');
+      setStep(3);
+
+      try {
+        const resp = await fetch(`/api/workflows/${currentWorkflowId}/select`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ lead_id: leadId }),
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          throw new Error(data.detail || 'Analysis workflow failed');
+        }
+        if (data.execution_status === 'FAILED' || (data.errors || []).length) {
+          throw new Error((data.errors || []).join('; ') || 'Research or proposal generation failed.');
+        }
+
+        renderAnalysis(data);
+        setStep(4);
+        showStatus('Research, proposal, and outreach drafts are ready in their separate views.', 'success');
+      } catch (err) {
+        showStatus(`Analysis failed: ${err.message}`, 'error');
+      } finally {
+        setLoader(false);
+      }
+    }
+
+    // 4. Render Analysis and Proposal
+    function renderAnalysisLegacy(data) {
+      const disc = currentSelectedLead?.discovery || {};
+      const research = data.research_results || {};
+      const proposal = data.proposal || {};
+      const email = data.outreach_email || {};
+      const ragContext = data.retrieved_context || [];
+
+      // Target Header
+      el('target-biz-name').textContent = disc.business_name || 'Business';
+      el('target-biz-category').textContent = `${disc.category || 'Category'} • ${disc.address || 'Address'}`;
+      el('target-biz-score').querySelector('span').textContent = currentSelectedLead?.scoring?.lead_score ?? '--';
+
+      // Research
+      el('res-summary').textContent = research.business_summary || 'No summary available.';
+
+      const servList = el('res-services');
+      servList.innerHTML = '';
+      (research.products_services || []).slice(0, 6).forEach(s => {
+        const li = document.createElement('li');
+        li.textContent = s;
+        servList.appendChild(li);
+      });
+      if (!research.products_services || research.products_services.length === 0) {
+        servList.innerHTML = '<li class="text-slate-500">Not specified</li>';
+      }
+
+      el('res-target').textContent = research.target_audience || 'General public / business clients';
+
+      const strDiv = el('res-strengths');
+      strDiv.innerHTML = '';
+      const strengths = research.swot?.strengths || research.provided_facts || [];
+      strengths.slice(0, 5).forEach(st => {
+        const span = document.createElement('span');
+        span.className = 'px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-slate-300 text-[11px]';
+        span.textContent = st;
+        strDiv.appendChild(span);
+      });
+
+      // RAG Chunks
+      const ragList = el('rag-context-list');
+      ragList.innerHTML = '';
+      if (ragContext.length === 0) {
+        ragList.innerHTML = '<p class="text-slate-500 italic">No specific RAG context chunks retrieved.</p>';
+      } else {
+        ragContext.forEach((doc, idx) => {
+          const item = document.createElement('div');
+          item.className = 'p-2.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1';
+          item.innerHTML = `
+            <div class="flex items-center justify-between text-[11px] text-purple-300 font-semibold">
+              <span>Source: ${doc.source || 'Knowledge Base'}</span>
+              <span class="text-slate-500">Chunk #${idx + 1}</span>
+            </div>
+            <p class="text-slate-400 text-[11px] leading-relaxed line-clamp-3">${doc.content}</p>
+          `;
+          ragList.appendChild(item);
+        });
+      }
+
+      // Proposal
+      el('prop-solution').value = proposal.proposed_solution || '';
+      el('prop-subject').value = email.subject || proposal.email_subject_options?.[0] || 'Partnership Inquiry';
+      el('prop-email').value = email.body || proposal.personalized_email || '';
+
+      const delivDiv = el('prop-deliverables');
+      delivDiv.innerHTML = '';
+      (proposal.deliverables || []).forEach(d => {
+        const p = document.createElement('p');
+        p.innerHTML = `• ${d}`;
+        delivDiv.appendChild(p);
+      });
+      if (!proposal.deliverables || proposal.deliverables.length === 0) {
+        delivDiv.innerHTML = '<p class="text-slate-500">Standard implementation roadmap</p>';
+      }
+
+      el('approval-pill').textContent = 'Pending Review';
+      el('approval-pill').className = 'text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium';
+
+      el('analysis-section').classList.remove('hidden');
+    }
+
+    // Render each result in its own detailed view.
+    function renderAnalysis(data) {
+      const disc = currentSelectedLead?.discovery || {};
+      const research = data.research_results || {};
+      const proposal = data.proposal || {};
+      const email = data.outreach_email || {};
+      const ragContext = data.retrieved_context || [];
+
+      el('target-biz-name').textContent = disc.business_name || 'Business';
+      el('target-biz-category').textContent = `${disc.category || 'Category'} · ${disc.address || 'Address'}`;
+      el('target-biz-score').querySelector('span').textContent = currentSelectedLead?.scoring?.lead_score ?? '--';
+
+      setDetail('res-summary', research.business_summary);
+      setDetail('res-target', research.target_audience);
+      setDetail('res-icp', research.ideal_customer_profile);
+      setDetail('res-decision-maker', research.decision_maker_identification);
+      renderList('res-services', research.products_services);
+      const strengthTags = el('res-strengths');
+      strengthTags.replaceChildren();
+      (research.swot?.strengths || []).forEach((strength) => {
+        const tag = document.createElement('span');
+        tag.className = 'rounded-md border border-slate-700 bg-slate-800 px-2 py-1 text-[11px] text-slate-300';
+        tag.textContent = strength;
+        strengthTags.appendChild(tag);
+      });
+      renderList('res-pain-points', research.pain_points);
+      renderList('res-opportunities', research.sales_opportunities);
+      renderList('res-swot-strengths', research.swot?.strengths);
+      renderList('res-swot-weaknesses', research.swot?.weaknesses);
+      renderList('res-swot-opportunities', research.swot?.opportunities);
+      renderList('res-swot-threats', research.swot?.threats);
+      renderList('res-facts', research.provided_facts);
+      renderList('res-inferences', research.reasonable_inferences);
+      renderList('res-missing', research.missing_information);
+
+      const ragList = el('rag-context-list');
+      ragList.replaceChildren();
+      if (!ragContext.length) {
+        const empty = document.createElement('p');
+        empty.className = 'italic text-slate-500';
+        empty.textContent = 'No supporting context was retrieved for this lead.';
+        ragList.appendChild(empty);
+      } else {
+        ragContext.forEach((doc, idx) => {
+          const item = document.createElement('div');
+          item.className = 'space-y-1 rounded-xl border border-slate-800 bg-slate-900 p-3';
+          const source = document.createElement('p');
+          source.className = 'text-[11px] font-semibold text-purple-300';
+          source.textContent = `Source: ${doc.source || 'Knowledge Base'} · Chunk ${idx + 1}`;
+          const content = document.createElement('p');
+          content.className = 'whitespace-pre-wrap text-xs leading-relaxed text-slate-400';
+          content.textContent = doc.content || (typeof doc === 'string' ? doc : JSON.stringify(doc));
+          item.append(source, content);
+          ragList.appendChild(item);
+        });
+      }
+
+      setDetail('prop-summary', proposal.business_summary);
+      renderList('prop-needs', proposal.identified_needs);
+      el('prop-solution').value = proposal.proposed_solution || '';
+      renderList('prop-deliverables', proposal.deliverables);
+      renderList('prop-timeline', proposal.implementation_timeline);
+      renderList('prop-benefits', proposal.expected_benefits);
+      setDetail('prop-pricing', proposal.pricing_suggestion);
+      renderList('prop-next-steps', proposal.next_steps);
+      setDetail('prop-angle', proposal.outreach_angle);
+
+      el('prop-subject').value = email.subject || proposal.email_subject_options?.[0] || '';
+      el('prop-email').value = email.body || proposal.personalized_email || '';
+      renderList('outreach-subject-options', proposal.email_subject_options);
+      setDetail('outreach-call-opener', proposal.call_opener);
+      renderList('outreach-questions', proposal.discovery_questions);
+
+      el('approval-pill').textContent = 'Pending Review';
+      el('approval-pill').className = 'text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium';
+      el('analysis-section').classList.remove('hidden');
+      setAnalysisTab('research');
+    }
+
+    // 5. Approve Proposal
+    el('btn-approve').addEventListener('click', async () => {
+      if (!currentWorkflowId) return;
+
+      const edited_proposal = {
+        proposed_solution: el('prop-solution').value,
+      };
+      const edited_email = {
+        subject: el('prop-subject').value,
+        body: el('prop-email').value,
+      };
+
+      try {
+        const resp = await fetch(`/api/workflows/${currentWorkflowId}/approve`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ approved: true, edited_proposal, edited_email }),
+        });
+        const data = await resp.json();
+
+        if (resp.ok) {
+          el('approval-pill').textContent = 'Approved';
+          el('approval-pill').className = 'text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 font-medium';
+          showStatus('Proposal approved. Review the separate Outreach tab before authorizing any dispatch.', 'success');
+
+          // Enable dispatch button if confirmed
+          checkDispatchReady();
+        }
+      } catch (err) {
+        showStatus(`Approval error: ${err.message}`, 'error');
+      }
+    });
+
+    // 6. Confirm Checkbox
+    el('chk-confirm').addEventListener('change', () => {
+      checkDispatchReady();
+    });
+
+    function checkDispatchReady() {
+      const confirmed = el('chk-confirm').checked;
+      const isApproved = el('approval-pill').textContent === 'Approved';
+      const btn = el('btn-dispatch');
+
+      if (confirmed && isApproved) {
+        btn.disabled = false;
+        btn.className = 'w-full py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-medium text-xs flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-sky-500/25 transition';
+      } else {
+        btn.disabled = true;
+        btn.className = 'w-full py-2.5 rounded-xl bg-slate-700 text-slate-400 font-medium text-xs flex items-center justify-center gap-2 cursor-not-allowed transition';
+      }
+    }
+
+    // 7. Dispatch Outreach
+    el('btn-dispatch').addEventListener('click', async () => {
+      if (!currentWorkflowId) return;
+      const channel = document.querySelector('input[name="outreach_channel"]:checked').value;
+
+      setLoader(true, 'Executing Outreach...', `Authorizing ${channel} outreach via configured integration...`);
+      const resBox = el('outreach-result-box');
+      resBox.classList.add('hidden');
+
+      try {
+        const resp = await fetch(`/api/workflows/${currentWorkflowId}/outreach`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ channel, confirm_approved: true }),
+        });
+        const data = await resp.json();
+
+        resBox.classList.remove('hidden');
+        if (resp.ok) {
+          const outcome = data.outreach_result || {};
+          resBox.className = 'p-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-200 text-xs space-y-1';
+          resBox.innerHTML = `
+            <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-check-circle"></i> Outreach Authorization Recorded</p>
+            <p>Channel: <b class="uppercase">${data.outreach_channel}</b> • Status: <b class="uppercase">${outcome.status || 'Success'}</b></p>
+            <p class="text-slate-300">${outcome.message || 'Outreach dispatched according to server settings.'}</p>
+          `;
+          showStatus('Outreach process completed and verified.', 'success');
+        } else {
+          resBox.className = 'p-3 rounded-xl border border-red-500/40 bg-red-500/10 text-red-200 text-xs';
+          resBox.textContent = `Outreach dispatch failed: ${data.detail || 'Server error'}`;
+        }
+      } catch (err) {
+        showStatus(`Outreach error: ${err.message}`, 'error');
+      } finally {
+        setLoader(false);
+      }
+    });
+  </script>
+</body>
+</html>
