@@ -1,0 +1,7 @@
+Lead Generation and CRM Workflow
+
+A lead generation workflow can organize how a business attracts inquiries, captures contact details, qualifies prospects, and follows up. The workflow should reflect the business's actual audience and consent practices.
+
+A CRM or sales pipeline can record a lead's source, current stage, next action, and interaction history. Useful stages are defined around the organization's real sales process rather than assumed conversion behavior.
+
+Possible implementation deliverables include a requirements map, lead capture form review, pipeline stage definitions, follow-up templates, and a handoff checklist. These are solution options, not evidence that a particular business has a lead management problem.

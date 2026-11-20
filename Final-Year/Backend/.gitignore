@@ -1,0 +1,50 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Environment & Secrets (Never commit live credentials)
+.env
+.env.*
+!.env.example
+
+# Databases & Runtime SQLite Storage
+*.sqlite3
+*.db
+*.sqlite
+app/results/
+
+# Unit Test & Coverage Caches
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs & Temporary Artifacts
+*.log
+scratch/
+tmp/
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Generated Files
+.DS_Store
+Thumbs.db
+
+.env
+venv/
+__pycache__/
+*.pyc
+*.sqlite3
+app/results/
